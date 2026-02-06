@@ -228,7 +228,7 @@ function DatePicker({ value, onChange }) {
                 onClick={handleNextMonth}
                 className="icon-button"
                 style={{ width: 24, height: 24 }}
-                // 如果下个月已经是未来，可以禁用（可选，这里简单起见不禁用翻页，只禁用日期点击）
+              // 如果下个月已经是未来，可以禁用（可选，这里简单起见不禁用翻页，只禁用日期点击）
               >
                 &gt;
               </button>
@@ -1808,60 +1808,60 @@ export default function HomePage() {
     return () => clearInterval(timer);
   }, []);
 
-    // 计算持仓收益
-    const getHoldingProfit = (fund, holding) => {
-        if (!holding || typeof holding.share !== 'number') return null;
+  // 计算持仓收益
+  const getHoldingProfit = (fund, holding) => {
+    if (!holding || typeof holding.share !== 'number') return null;
 
-        const now = new Date();
-        const isAfter9 = now.getHours() >= 9;
-        const hasTodayData = fund.jzrq === todayStr;
+    const now = new Date();
+    const isAfter9 = now.getHours() >= 9;
+    const hasTodayData = fund.jzrq === todayStr;
 
-        // 如果是交易日且9点以后，且今日净值未出，则强制使用估值（隐藏涨跌幅列模式）
-        const useValuation = isTradingDay && isAfter9 && !hasTodayData;
+    // 如果是交易日且9点以后，且今日净值未出，则强制使用估值（隐藏涨跌幅列模式）
+    const useValuation = isTradingDay && isAfter9 && !hasTodayData;
 
-        let currentNav;
-        let profitToday;
+    let currentNav;
+    let profitToday;
 
-        if (!useValuation) {
-            // 使用确权净值 (dwjz)
-            currentNav = Number(fund.dwjz);
-            if (!currentNav) return null;
+    if (!useValuation) {
+      // 使用确权净值 (dwjz)
+      currentNav = Number(fund.dwjz);
+      if (!currentNav) return null;
 
-            const amount = holding.share * currentNav;
-            // 优先用 zzl (真实涨跌幅), 降级用 gszzl
-            const rate = fund.zzl !== undefined ? Number(fund.zzl) : (Number(fund.gszzl) || 0);
-            profitToday = amount - (amount / (1 + rate / 100));
-        } else {
-            // 否则使用估值
-            currentNav = fund.estPricedCoverage > 0.05
-                ? fund.estGsz
-                : (typeof fund.gsz === 'number' ? fund.gsz : Number(fund.dwjz));
+      const amount = holding.share * currentNav;
+      // 优先用 zzl (真实涨跌幅), 降级用 gszzl
+      const rate = fund.zzl !== undefined ? Number(fund.zzl) : (Number(fund.gszzl) || 0);
+      profitToday = amount - (amount / (1 + rate / 100));
+    } else {
+      // 否则使用估值
+      currentNav = fund.estPricedCoverage > 0.05
+        ? fund.estGsz
+        : (typeof fund.gsz === 'number' ? fund.gsz : Number(fund.dwjz));
 
-            if (!currentNav) return null;
+      if (!currentNav) return null;
 
-            const amount = holding.share * currentNav;
-            // 估值涨跌幅
-            const gzChange = fund.estPricedCoverage > 0.05 ? fund.estGszzl : (Number(fund.gszzl) || 0);
-            profitToday = amount - (amount / (1 + gzChange / 100));
-        }
+      const amount = holding.share * currentNav;
+      // 估值涨跌幅
+      const gzChange = fund.estPricedCoverage > 0.05 ? fund.estGszzl : (Number(fund.gszzl) || 0);
+      profitToday = amount - (amount / (1 + gzChange / 100));
+    }
 
-        // 持仓金额
-        const amount = holding.share * currentNav;
+    // 持仓金额
+    const amount = holding.share * currentNav;
 
-        // 总收益 = (当前净值 - 成本价) * 份额
-        const profitTotal = typeof holding.cost === 'number'
-            ? (currentNav - holding.cost) * holding.share
-            : null;
+    // 总收益 = (当前净值 - 成本价) * 份额
+    const profitTotal = typeof holding.cost === 'number'
+      ? (currentNav - holding.cost) * holding.share
+      : null;
 
-        return {
-            amount,
-            profitToday,
-            profitTotal
-        };
+    return {
+      amount,
+      profitToday,
+      profitTotal
     };
+  };
 
 
-    // 过滤和排序后的基金列表
+  // 过滤和排序后的基金列表
   const displayFunds = funds
     .filter(f => {
       if (currentTab === 'all') return true;
@@ -1869,7 +1869,7 @@ export default function HomePage() {
       const group = groups.find(g => g.id === currentTab);
       return group ? group.codes.includes(f.code) : true;
     })
-  .sort((a, b) => {
+    .sort((a, b) => {
       if (sortBy === 'yield') {
         const valA = typeof a.estGszzl === 'number' ? a.estGszzl : (Number(a.gszzl) || 0);
         const valB = typeof b.estGszzl === 'number' ? b.estGszzl : (Number(b.gszzl) || 0);
@@ -1882,7 +1882,7 @@ export default function HomePage() {
         const valB = pb?.profitTotal ?? Number.NEGATIVE_INFINITY;
         return sortOrder === 'asc' ? valA - valB : valB - valA;
       }
-      if(sortBy === 'name'){
+      if (sortBy === 'name') {
         return sortOrder === 'asc' ? a.name.localeCompare(b.name, 'zh-CN') : b.name.localeCompare(a.name, 'zh-CN');
       }
       return 0;
@@ -2170,7 +2170,7 @@ export default function HomePage() {
       if (savedHoldings && typeof savedHoldings === 'object') {
         setHoldings(savedHoldings);
       }
-    } catch {}
+    } catch { }
   }, []);
 
   useEffect(() => {
@@ -2202,6 +2202,97 @@ export default function HomePage() {
     });
   };
 
+  // 当估值接口无法获取数据时，使用腾讯接口获取基金基本信息和净值（回退方案）
+  const fetchFundDataFallback = async (c) => {
+    return new Promise(async (resolve, reject) => {
+      // 先通过东方财富搜索接口获取基金名称
+      const searchCallbackName = `SuggestData_fallback_${Date.now()}`;
+      const searchUrl = `https://fundsuggest.eastmoney.com/FundSearch/api/FundSearchAPI.ashx?m=1&key=${encodeURIComponent(c)}&callback=${searchCallbackName}&_=${Date.now()}`;
+
+      let fundName = '';
+
+      try {
+        await new Promise((resSearch, rejSearch) => {
+          window[searchCallbackName] = (data) => {
+            if (data && data.Datas && data.Datas.length > 0) {
+              const found = data.Datas.find(d => d.CODE === c);
+              if (found) {
+                fundName = found.NAME || found.SHORTNAME || '';
+              }
+            }
+            delete window[searchCallbackName];
+            resSearch();
+          };
+
+          const script = document.createElement('script');
+          script.src = searchUrl;
+          script.async = true;
+          script.onload = () => {
+            if (document.body.contains(script)) document.body.removeChild(script);
+          };
+          script.onerror = () => {
+            if (document.body.contains(script)) document.body.removeChild(script);
+            delete window[searchCallbackName];
+            rejSearch(new Error('搜索接口失败'));
+          };
+          document.body.appendChild(script);
+
+          // 超时处理
+          setTimeout(() => {
+            if (window[searchCallbackName]) {
+              delete window[searchCallbackName];
+              resSearch();
+            }
+          }, 3000);
+        });
+      } catch (e) {
+        // 搜索失败，继续尝试腾讯接口
+      }
+
+      // 使用腾讯接口获取净值数据
+      const tUrl = `https://qt.gtimg.cn/q=jj${c}`;
+      const tScript = document.createElement('script');
+      tScript.src = tUrl;
+      tScript.onload = () => {
+        const v = window[`v_jj${c}`];
+        if (v && v.length > 5) {
+          const p = v.split('~');
+          // p[1]: 基金名称, p[5]: 单位净值, p[7]: 涨跌幅, p[8]: 净值日期
+          const name = fundName || p[1] || `未知基金(${c})`;
+          const dwjz = p[5];
+          const zzl = parseFloat(p[7]);
+          const jzrq = p[8] ? p[8].slice(0, 10) : '';
+
+          if (dwjz) {
+            // 成功获取净值数据
+            resolve({
+              code: c,
+              name: name,
+              dwjz: dwjz,
+              gsz: null, // 无估值数据
+              gztime: null,
+              jzrq: jzrq,
+              gszzl: null, // 无估值涨跌幅
+              zzl: !isNaN(zzl) ? zzl : null,
+              noValuation: true, // 标记为无估值数据
+              holdings: []
+            });
+          } else {
+            reject(new Error('未能获取到基金数据'));
+          }
+        } else {
+          reject(new Error('未能获取到基金数据'));
+        }
+        if (document.body.contains(tScript)) document.body.removeChild(tScript);
+      };
+      tScript.onerror = () => {
+        if (document.body.contains(tScript)) document.body.removeChild(tScript);
+        reject(new Error('基金数据加载失败'));
+      };
+      document.body.appendChild(tScript);
+    });
+  };
+
   const fetchFundData = async (c) => {
     return new Promise(async (resolve, reject) => {
       // 腾讯接口识别逻辑优化
@@ -2226,7 +2317,8 @@ export default function HomePage() {
       window.jsonpgz = (json) => {
         window.jsonpgz = originalJsonpgz; // 立即恢复
         if (!json || typeof json !== 'object') {
-          reject(new Error('未获取到基金估值数据'));
+          // 估值数据无法获取时，尝试使用腾讯接口获取基金基本信息和净值
+          fetchFundDataFallback(c).then(resolve).catch(reject);
           return;
         }
         const gszzlNum = Number(json.gszzl);
@@ -2365,7 +2457,7 @@ export default function HomePage() {
                   };
                   document.body.appendChild(scriptQuote);
                 });
-              } catch (e) {}
+              } catch (e) { }
             }
             resolveH(holdings);
           }).catch(() => resolveH([]));
@@ -2879,7 +2971,7 @@ export default function HomePage() {
           <span>基估宝</span>
         </div>
         <div className="actions">
-            <img  alt="项目Github地址" src={githubImg.src} style={{width:'30px',height: '30px', cursor: 'pointer'}} onClick={()=> window.open("https://github.com/hzm0321/real-time-fund")}/>
+          <img alt="项目Github地址" src={githubImg.src} style={{ width: '30px', height: '30px', cursor: 'pointer' }} onClick={() => window.open("https://github.com/hzm0321/real-time-fund")} />
           <div className="badge" title="当前刷新频率">
             <span>刷新</span>
             <strong>{Math.round(refreshMs / 1000)}秒</strong>
@@ -3001,56 +3093,56 @@ export default function HomePage() {
                 data-mask-right={canRight}
               >
                 <div
-                    className="tabs"
-                    ref={tabsRef}
-                    onMouseDown={handleMouseDown}
-                    onMouseLeave={handleMouseLeaveOrUp}
-                    onMouseUp={handleMouseLeaveOrUp}
-                    onMouseMove={handleMouseMove}
-                    onWheel={handleWheel}
-                    onScroll={updateTabOverflow}
-                  >
-                    <AnimatePresence mode="popLayout">
+                  className="tabs"
+                  ref={tabsRef}
+                  onMouseDown={handleMouseDown}
+                  onMouseLeave={handleMouseLeaveOrUp}
+                  onMouseUp={handleMouseLeaveOrUp}
+                  onMouseMove={handleMouseMove}
+                  onWheel={handleWheel}
+                  onScroll={updateTabOverflow}
+                >
+                  <AnimatePresence mode="popLayout">
+                    <motion.button
+                      layout
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      key="all"
+                      className={`tab ${currentTab === 'all' ? 'active' : ''}`}
+                      onClick={() => setCurrentTab('all')}
+                      transition={{ type: 'spring', stiffness: 500, damping: 30, mass: 1 }}
+                    >
+                      全部 ({funds.length})
+                    </motion.button>
+                    <motion.button
+                      layout
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      key="fav"
+                      className={`tab ${currentTab === 'fav' ? 'active' : ''}`}
+                      onClick={() => setCurrentTab('fav')}
+                      transition={{ type: 'spring', stiffness: 500, damping: 30, mass: 1 }}
+                    >
+                      自选 ({favorites.size})
+                    </motion.button>
+                    {groups.map(g => (
                       <motion.button
                         layout
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.8 }}
-                        key="all"
-                        className={`tab ${currentTab === 'all' ? 'active' : ''}`}
-                        onClick={() => setCurrentTab('all')}
+                        key={g.id}
+                        className={`tab ${currentTab === g.id ? 'active' : ''}`}
+                        onClick={() => setCurrentTab(g.id)}
                         transition={{ type: 'spring', stiffness: 500, damping: 30, mass: 1 }}
                       >
-                        全部 ({funds.length})
+                        {g.name} ({g.codes.length})
                       </motion.button>
-                      <motion.button
-                        layout
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.8 }}
-                        key="fav"
-                        className={`tab ${currentTab === 'fav' ? 'active' : ''}`}
-                        onClick={() => setCurrentTab('fav')}
-                        transition={{ type: 'spring', stiffness: 500, damping: 30, mass: 1 }}
-                      >
-                        自选 ({favorites.size})
-                      </motion.button>
-                      {groups.map(g => (
-                        <motion.button
-                          layout
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.8 }}
-                          key={g.id}
-                          className={`tab ${currentTab === g.id ? 'active' : ''}`}
-                          onClick={() => setCurrentTab(g.id)}
-                          transition={{ type: 'spring', stiffness: 500, damping: 30, mass: 1 }}
-                        >
-                          {g.name} ({g.codes.length})
-                        </motion.button>
-                      ))}
-                    </AnimatePresence>
-                  </div>
+                    ))}
+                  </AnimatePresence>
+                </div>
               </div>
               {groups.length > 0 && (
                 <button
@@ -3071,74 +3163,74 @@ export default function HomePage() {
             </div>
 
             <div className="sort-group" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div className="view-toggle" style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', padding: '2px' }}>
-                  <button
-                    className={`icon-button ${viewMode === 'card' ? 'active' : ''}`}
-                    onClick={() => { setViewMode('card'); localStorage.setItem('viewMode', 'card'); }}
-                    style={{ border: 'none', width: '32px', height: '32px', background: viewMode === 'card' ? 'var(--primary)' : 'transparent', color: viewMode === 'card' ? '#05263b' : 'var(--muted)' }}
-                    title="卡片视图"
-                  >
-                    <GridIcon width="16" height="16" />
-                  </button>
-                  <button
-                      className={`icon-button ${viewMode === 'list' ? 'active' : ''}`}
-                      onClick={() => { setViewMode('list'); localStorage.setItem('viewMode', 'list'); }}
-                      style={{ border: 'none', width: '32px', height: '32px', background: viewMode === 'list' ? 'var(--primary)' : 'transparent', color: viewMode === 'list' ? '#05263b' : 'var(--muted)' }}
-                      title="表格视图"
+              <div className="view-toggle" style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', padding: '2px' }}>
+                <button
+                  className={`icon-button ${viewMode === 'card' ? 'active' : ''}`}
+                  onClick={() => { setViewMode('card'); localStorage.setItem('viewMode', 'card'); }}
+                  style={{ border: 'none', width: '32px', height: '32px', background: viewMode === 'card' ? 'var(--primary)' : 'transparent', color: viewMode === 'card' ? '#05263b' : 'var(--muted)' }}
+                  title="卡片视图"
+                >
+                  <GridIcon width="16" height="16" />
+                </button>
+                <button
+                  className={`icon-button ${viewMode === 'list' ? 'active' : ''}`}
+                  onClick={() => { setViewMode('list'); localStorage.setItem('viewMode', 'list'); }}
+                  style={{ border: 'none', width: '32px', height: '32px', background: viewMode === 'list' ? 'var(--primary)' : 'transparent', color: viewMode === 'list' ? '#05263b' : 'var(--muted)' }}
+                  title="表格视图"
+                >
+                  <ListIcon width="16" height="16" />
+                </button>
+              </div>
+
+              <div className="divider" style={{ width: '1px', height: '20px', background: 'var(--border)' }} />
+
+              <div className="sort-items" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span className="muted" style={{ fontSize: '12px', display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <SortIcon width="14" height="14" />
+                  排序
+                </span>
+                <div className="chips">
+                  {[
+                    { id: 'default', label: '默认' },
+                    { id: 'yield', label: '涨跌幅' },
+                    { id: 'holding', label: '持有收益' },
+                    { id: 'name', label: '名称' },
+                  ].map((s) => (
+                    <button
+                      key={s.id}
+                      className={`chip ${sortBy === s.id ? 'active' : ''}`}
+                      onClick={() => {
+                        if (sortBy === s.id) {
+                          // 同一按钮重复点击，切换升序/降序
+                          setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+                        } else {
+                          // 切换到新的排序字段，默认用降序
+                          setSortBy(s.id);
+                          setSortOrder('desc');
+                        }
+                      }}
+                      style={{ height: '28px', fontSize: '12px', padding: '0 10px', display: 'flex', alignItems: 'center', gap: 4 }}
                     >
-                      <ListIcon width="16" height="16" />
+                      <span>{s.label}</span>
+                      {s.id !== 'default' && sortBy === s.id && (
+                        <span
+                          style={{
+                            display: 'inline-flex',
+                            flexDirection: 'column',
+                            lineHeight: 1,
+                            fontSize: '8px',
+                          }}
+                        >
+                          <span style={{ opacity: sortOrder === 'asc' ? 1 : 0.3 }}>▲</span>
+                          <span style={{ opacity: sortOrder === 'desc' ? 1 : 0.3 }}>▼</span>
+                        </span>
+                      )}
                     </button>
-                </div>
-
-                <div className="divider" style={{ width: '1px', height: '20px', background: 'var(--border)' }} />
-
-                <div className="sort-items" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span className="muted" style={{ fontSize: '12px', display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <SortIcon width="14" height="14" />
-                    排序
-                  </span>
-                  <div className="chips">
-                    {[
-                      { id: 'default', label: '默认' },
-                      { id: 'yield', label: '涨跌幅' },
-                      { id: 'holding', label: '持有收益' },
-                      { id: 'name', label: '名称' },
-                    ].map((s) => (
-                      <button
-                        key={s.id}
-                        className={`chip ${sortBy === s.id ? 'active' : ''}`}
-                        onClick={() => {
-                          if (sortBy === s.id) {
-                            // 同一按钮重复点击，切换升序/降序
-                            setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
-                          } else {
-                            // 切换到新的排序字段，默认用降序
-                            setSortBy(s.id);
-                            setSortOrder('desc');
-                          }
-                        }}
-                        style={{ height: '28px', fontSize: '12px', padding: '0 10px', display: 'flex', alignItems: 'center', gap: 4 }}
-                      >
-                        <span>{s.label}</span>
-                        {s.id !== 'default' && sortBy === s.id && (
-                          <span
-                            style={{
-                              display: 'inline-flex',
-                              flexDirection: 'column',
-                              lineHeight: 1,
-                              fontSize: '8px',
-                            }}
-                          >
-                            <span style={{ opacity: sortOrder === 'asc' ? 1 : 0.3 }}>▲</span>
-                            <span style={{ opacity: sortOrder === 'desc' ? 1 : 0.3 }}>▼</span>
-                          </span>
-                        )}
-                      </button>
-                    ))}
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
+          </div>
 
           {displayFunds.length === 0 ? (
             <div className="glass card empty" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 20px' }}>
@@ -3199,483 +3291,509 @@ export default function HomePage() {
               )}
 
               <AnimatePresence mode="wait">
-              <motion.div
-                key={viewMode}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
-                className={viewMode === 'card' ? 'grid' : 'table-container glass'}
-              >
-                <div className={viewMode === 'card' ? 'grid col-12' : ''} style={viewMode === 'card' ? { gridColumn: 'span 12', gap: 16 } : {}}>
-                  {viewMode === 'list' && (
-                    <div className="table-header-row">
-                      <div className="table-header-cell">基金名称</div>
-                      <div className="table-header-cell text-right">净值/估值</div>
-                      <div className="table-header-cell text-right">涨跌幅</div>
-                      <div className="table-header-cell text-right">估值时间</div>
-                      <div className="table-header-cell text-right">持仓金额</div>
-                      <div className="table-header-cell text-right">当日盈亏</div>
-                      <div className="table-header-cell text-right">持有收益</div>
-                      <div className="table-header-cell text-center">操作</div>
-                    </div>
-                  )}
-                  <AnimatePresence mode="popLayout">
-                    {displayFunds.map((f) => (
-                      <motion.div
-                        layout="position"
-                        key={f.code}
-                        className={viewMode === 'card' ? 'col-6' : 'table-row-wrapper'}
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        transition={{ duration: 0.2 }}
-                        style={{ position: 'relative', overflow: 'hidden' }}
-                      >
-                      {viewMode === 'list' && isMobile && (
-                        <div
-                          className="swipe-action-bg"
-                          onClick={(e) => {
-                            e.stopPropagation(); // 阻止冒泡，防止触发全局收起导致状态混乱
-                            if (refreshing) return;
-                            requestRemoveFund(f);
-                          }}
-                          style={{ pointerEvents: refreshing ? 'none' : 'auto', opacity: refreshing ? 0.6 : 1 }}
+                <motion.div
+                  key={viewMode}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                  className={viewMode === 'card' ? 'grid' : 'table-container glass'}
+                >
+                  <div className={viewMode === 'card' ? 'grid col-12' : ''} style={viewMode === 'card' ? { gridColumn: 'span 12', gap: 16 } : {}}>
+                    {viewMode === 'list' && (
+                      <div className="table-header-row">
+                        <div className="table-header-cell">基金名称</div>
+                        <div className="table-header-cell text-right">净值/估值</div>
+                        <div className="table-header-cell text-right">涨跌幅</div>
+                        <div className="table-header-cell text-right">估值时间</div>
+                        <div className="table-header-cell text-right">持仓金额</div>
+                        <div className="table-header-cell text-right">当日盈亏</div>
+                        <div className="table-header-cell text-right">持有收益</div>
+                        <div className="table-header-cell text-center">操作</div>
+                      </div>
+                    )}
+                    <AnimatePresence mode="popLayout">
+                      {displayFunds.map((f) => (
+                        <motion.div
+                          layout="position"
+                          key={f.code}
+                          className={viewMode === 'card' ? 'col-6' : 'table-row-wrapper'}
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.95 }}
+                          transition={{ duration: 0.2 }}
+                          style={{ position: 'relative', overflow: 'hidden' }}
                         >
-                          <TrashIcon width="18" height="18" />
-                          <span>删除</span>
-                        </div>
-                      )}
-                      <motion.div
-                        className={viewMode === 'card' ? 'glass card' : 'table-row'}
-                        drag={viewMode === 'list' && isMobile ? "x" : false}
-                        dragConstraints={{ left: -80, right: 0 }}
-                        dragElastic={0.1}
-                        // 增加 dragDirectionLock 确保在垂直滚动时不会轻易触发水平拖拽
-                        dragDirectionLock={true}
-                        // 调整触发阈值，只有明显的水平拖拽意图才响应
-                        onDragStart={(event, info) => {
-                          // 如果水平移动距离小于垂直移动距离，或者水平速度很小，视为垂直滚动意图，不进行拖拽处理
-                          // framer-motion 的 dragDirectionLock 已经处理了大部分情况，但可以进一步微调体验
-                        }}
-                        // 如果当前行不是被选中的行，强制回到原点 (x: 0)
-                        animate={viewMode === 'list' && isMobile ? { x: swipedFundCode === f.code ? -80 : 0 } : undefined}
-                        onDragEnd={(e, { offset, velocity }) => {
-                          if (viewMode === 'list' && isMobile) {
-                             if (offset.x < -40) {
-                               setSwipedFundCode(f.code);
-                             } else {
-                               setSwipedFundCode(null);
-                             }
-                          }
-                        }}
-                        onClick={(e) => {
-                          // 阻止事件冒泡，避免触发全局的 click listener 导致立刻被收起
-                          // 只有在已经展开的情况下点击自身才需要阻止冒泡（或者根据需求调整）
-                          // 这里我们希望：点击任何地方都收起。
-                          // 如果点击的是当前行，且不是拖拽操作，上面的全局 listener 会处理收起。
-                          // 但为了防止点击行内容触发收起后又立即触发行的其他点击逻辑（如果有的话），
-                          // 可以在这里处理。不过当前需求是“点击其他区域收起”，
-                          // 实际上全局 listener 已经覆盖了“点击任何区域（包括其他行）收起”。
-                          // 唯一的问题是：点击当前行的“删除按钮”时，会先触发全局 click 导致收起，然后触发删除吗？
-                          // 删除按钮在底层，通常不会受影响，因为 React 事件和原生事件的顺序。
-                          // 但为了保险，删除按钮的 onClick 应该阻止冒泡。
-
-                          // 如果当前行已展开，点击行内容（非删除按钮）应该收起
-                          if (viewMode === 'list' && isMobile && swipedFundCode === f.code) {
-                             e.stopPropagation(); // 阻止冒泡，自己处理收起，避免触发全局再次处理
-                             setSwipedFundCode(null);
-                          }
-                        }}
-                        style={{
-                          background: viewMode === 'list' ? 'var(--bg)' : undefined,
-                          position: 'relative',
-                          zIndex: 1
-                        }}
-                      >
-                        {viewMode === 'list' ? (
-                          <>
-                            <div className="table-cell name-cell">
-                              {currentTab !== 'all' && currentTab !== 'fav' ? (
-                                <button
-                                  className="icon-button fav-button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    removeFundFromCurrentGroup(f.code);
-                                  }}
-                                  title="从当前分组移除"
-                                >
-                                  <ExitIcon width="18" height="18" style={{ transform: 'rotate(180deg)' }} />
-                                </button>
-                              ) : (
-                                <button
-                                  className={`icon-button fav-button ${favorites.has(f.code) ? 'active' : ''}`}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    toggleFavorite(f.code);
-                                  }}
-                                  title={favorites.has(f.code) ? "取消自选" : "添加自选"}
-                                >
-                                  <StarIcon width="18" height="18" filled={favorites.has(f.code)} />
-                                </button>
-                              )}
-                              <div className="title-text">
-                            <span
-                              className={`name-text ${f.jzrq === todayStr ? 'updated' : ''}`}
-                              title={f.jzrq === todayStr ? "今日净值已更新" : ""}
+                          {viewMode === 'list' && isMobile && (
+                            <div
+                              className="swipe-action-bg"
+                              onClick={(e) => {
+                                e.stopPropagation(); // 阻止冒泡，防止触发全局收起导致状态混乱
+                                if (refreshing) return;
+                                requestRemoveFund(f);
+                              }}
+                              style={{ pointerEvents: refreshing ? 'none' : 'auto', opacity: refreshing ? 0.6 : 1 }}
                             >
-                              {f.name}
-                            </span>
-                                <span className="muted code-text">#{f.code}</span>
-                              </div>
-                            </div>
-                            {(() => {
-                              const now = new Date();
-                              const isAfter9 = now.getHours() >= 9;
-                              const hasTodayData = f.jzrq === todayStr;
-                              const shouldHideChange = isTradingDay && isAfter9 && !hasTodayData;
-
-                              if (!shouldHideChange) {
-                                // 如果涨跌幅列显示（即非交易时段或今日净值已更新），则显示单位净值和真实涨跌幅
-                                return (
-                                  <>
-                                    <div className="table-cell text-right value-cell">
-                                      <span style={{ fontWeight: 700 }}>{f.dwjz ?? '—'}</span>
-                                    </div>
-                                    <div className="table-cell text-right change-cell">
-                                      <span className={f.zzl > 0 ? 'up' : f.zzl < 0 ? 'down' : ''} style={{ fontWeight: 700 }}>
-                                        {f.zzl !== undefined ? `${f.zzl > 0 ? '+' : ''}${Number(f.zzl).toFixed(2)}%` : ''}
-                                      </span>
-                                    </div>
-                                  </>
-                                );
-                              } else {
-                                // 否则显示估值净值和估值涨跌幅
-                                return (
-                                  <>
-                                    <div className="table-cell text-right value-cell">
-                                      <span style={{ fontWeight: 700 }}>{f.estPricedCoverage > 0.05 ? f.estGsz.toFixed(4) : (f.gsz ?? '—')}</span>
-                                    </div>
-                                    <div className="table-cell text-right change-cell">
-                                      <span className={f.estPricedCoverage > 0.05 ? (f.estGszzl > 0 ? 'up' : f.estGszzl < 0 ? 'down' : '') : (Number(f.gszzl) > 0 ? 'up' : Number(f.gszzl) < 0 ? 'down' : '')} style={{ fontWeight: 700 }}>
-                                        {f.estPricedCoverage > 0.05 ? `${f.estGszzl > 0 ? '+' : ''}${f.estGszzl.toFixed(2)}%` : (typeof f.gszzl === 'number' ? `${f.gszzl > 0 ? '+' : ''}${f.gszzl.toFixed(2)}%` : f.gszzl ?? '—')}
-                                      </span>
-                                    </div>
-                                  </>
-                                );
-                              }
-                            })()}
-                            <div className="table-cell text-right time-cell">
-                              <span className="muted" style={{ fontSize: '12px' }}>{f.gztime || f.time || '-'}</span>
-                            </div>
-                            {!isMobile && (() => {
-                              const holding = holdings[f.code];
-                              const profit = getHoldingProfit(f, holding);
-                              const amount = profit ? profit.amount : null;
-                              if (amount === null) {
-                                return (
-                                  <div
-                                    className="table-cell text-right holding-amount-cell"
-                                    title="设置持仓"
-                                    onClick={(e) => { e.stopPropagation(); setHoldingModal({ open: true, fund: f }); }}
-                                  >
-                                    <span className="muted" style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '12px', cursor: 'pointer' }}>
-                                      未设置 <SettingsIcon width="12" height="12" />
-                                    </span>
-                                  </div>
-                                );
-                              }
-                              return (
-                                <div
-                                  className="table-cell text-right holding-amount-cell"
-                                  title="点击设置持仓"
-                                  onClick={(e) => { e.stopPropagation(); setActionModal({ open: true, fund: f }); }}
-                                >
-                                  <span style={{ fontWeight: 700, marginRight: 6 }}>¥{amount.toFixed(2)}</span>
-                                  <button
-                                    className="icon-button"
-                                    onClick={(e) => { e.stopPropagation(); setActionModal({ open: true, fund: f }); }}
-                                    title="编辑持仓"
-                                    style={{ border: 'none', width: '28px', height: '28px', marginLeft: -6 }}
-                                  >
-                                    <SettingsIcon width="14" height="14" />
-                                  </button>
-                                </div>
-                              );
-                            })()}
-                            {(() => {
-                              const holding = holdings[f.code];
-                              const profit = getHoldingProfit(f, holding);
-                              const profitValue = profit ? profit.profitToday : null;
-                              const hasProfit = profitValue !== null;
-
-                              return (
-                                <div className="table-cell text-right profit-cell">
-                                  <span
-                                    className={hasProfit ? (profitValue > 0 ? 'up' : profitValue < 0 ? 'down' : '') : 'muted'}
-                                    style={{ fontWeight: 700 }}
-                                  >
-                                    {hasProfit
-                                      ? `${profitValue > 0 ? '+' : profitValue < 0 ? '-' : ''}¥${Math.abs(profitValue).toFixed(2)}`
-                                      : ''}
-                                  </span>
-                                </div>
-                              );
-                            })()}
-                            {!isMobile && (() => {
-                              const holding = holdings[f.code];
-                              const profit = getHoldingProfit(f, holding);
-                              const total = profit ? profit.profitTotal : null;
-                              const principal = holding && holding.cost && holding.share ? holding.cost * holding.share : 0;
-                              const asPercent = percentModes[f.code];
-                              const hasTotal = total !== null;
-                              const formatted = hasTotal
-                                ? (asPercent && principal > 0
-                                  ? `${total > 0 ? '+' : total < 0 ? '-' : ''}${Math.abs((total / principal) * 100).toFixed(2)}%`
-                                  : `${total > 0 ? '+' : total < 0 ? '-' : ''}¥${Math.abs(total).toFixed(2)}`)
-                                : '';
-                              const cls = hasTotal ? (total > 0 ? 'up' : total < 0 ? 'down' : '') : 'muted';
-                              return (
-                                <div
-                                  className="table-cell text-right holding-cell"
-                                  title="点击切换金额/百分比"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    if (hasTotal) {
-                                      setPercentModes(prev => ({ ...prev, [f.code]: !prev[f.code] }));
-                                    }
-                                  }}
-                                  style={{ cursor: hasTotal ? 'pointer' : 'default' }}
-                                >
-                                  <span className={cls} style={{ fontWeight: 700 }}>{formatted}</span>
-                                </div>
-                              );
-                            })()}
-                            <div className="table-cell text-center action-cell" style={{ gap: 4 }}>
-                              <button
-                                className="icon-button danger"
-                                onClick={() => !refreshing && requestRemoveFund(f)}
-                                title="删除"
-                                disabled={refreshing}
-                                style={{ width: '28px', height: '28px', opacity: refreshing ? 0.6 : 1, cursor: refreshing ? 'not-allowed' : 'pointer' }}
-                              >
-                                <TrashIcon width="14" height="14" />
-                              </button>
-                            </div>
-                          </>
-                        ) : (
-                          <>
-                          <div className="row" style={{ marginBottom: 10 }}>
-                            <div className="title">
-                              {currentTab !== 'all' && currentTab !== 'fav' ? (
-                                <button
-                                  className="icon-button fav-button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    removeFundFromCurrentGroup(f.code);
-                                  }}
-                                  title="从当前分组移除"
-                                >
-                                  <ExitIcon width="18" height="18" style={{ transform: 'rotate(180deg)' }} />
-                                </button>
-                              ) : (
-                                <button
-                                  className={`icon-button fav-button ${favorites.has(f.code) ? 'active' : ''}`}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    toggleFavorite(f.code);
-                                  }}
-                                  title={favorites.has(f.code) ? "取消自选" : "添加自选"}
-                                >
-                                  <StarIcon width="18" height="18" filled={favorites.has(f.code)} />
-                                </button>
-                              )}
-                              <div className="title-text">
-                                <span
-                                  className={`name-text ${f.jzrq === todayStr ? 'updated' : ''}`}
-                                  title={f.jzrq === todayStr ? "今日净值已更新" : ""}
-                                >
-                                  {f.name}
-                                </span>
-                                <span className="muted">#{f.code}</span>
-                              </div>
-                            </div>
-
-                            <div className="actions">
-                              <div className="badge-v">
-                                <span>估值时间</span>
-                                <strong>{f.gztime || f.time || '-'}</strong>
-                              </div>
-                              <div className="row" style={{ gap: 4 }}>
-                                <button
-                                  className="icon-button danger"
-                                  onClick={() => !refreshing && requestRemoveFund(f)}
-                                  title="删除"
-                                  disabled={refreshing}
-                                  style={{ width: '28px', height: '28px', opacity: refreshing ? 0.6 : 1, cursor: refreshing ? 'not-allowed' : 'pointer' }}
-                                >
-                                  <TrashIcon width="14" height="14" />
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="row" style={{ marginBottom: 12 }}>
-                            <Stat label="单位净值" value={f.dwjz ?? '—'} />
-                            {(() => {
-                              const now = new Date();
-                              const isAfter9 = now.getHours() >= 9;
-                              const hasTodayData = f.jzrq === todayStr;
-                              const shouldHideChange = isTradingDay && isAfter9 && !hasTodayData;
-
-                              if (shouldHideChange) return null;
-
-                              return (
-                                <Stat
-                                  label="涨跌幅"
-                                  value={f.zzl !== undefined ? `${f.zzl > 0 ? '+' : ''}${Number(f.zzl).toFixed(2)}%` : ''}
-                                  delta={f.zzl}
-                                />
-                              );
-                            })()}
-                            <Stat label="估值净值" value={f.estPricedCoverage > 0.05 ? f.estGsz.toFixed(4) : (f.gsz ?? '—')} />
-                            <Stat
-                              label="估值涨跌幅"
-                              value={f.estPricedCoverage > 0.05 ? `${f.estGszzl > 0 ? '+' : ''}${f.estGszzl.toFixed(2)}%` : (typeof f.gszzl === 'number' ? `${f.gszzl > 0 ? '+' : ''}${f.gszzl.toFixed(2)}%` : f.gszzl ?? '—')}
-                              delta={f.estPricedCoverage > 0.05 ? f.estGszzl : (Number(f.gszzl) || 0)}
-                            />
-                          </div>
-
-                          <div className="row" style={{ marginBottom: 12 }}>
-                            {(() => {
-                              const holding = holdings[f.code];
-                              const profit = getHoldingProfit(f, holding);
-
-                              if (!profit) {
-                                return (
-                                  <div className="stat" style={{ flexDirection: 'column', gap: 4 }}>
-                                    <span className="label">持仓金额</span>
-                                    <div
-                                      className="value muted"
-                                      style={{ fontSize: '14px', display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}
-                                      onClick={() => setHoldingModal({ open: true, fund: f })}
-                                    >
-                                      未设置 <SettingsIcon width="12" height="12" />
-                                    </div>
-                                  </div>
-                                );
-                              }
-
-                              return (
-                                <>
-                                  <div
-                                    className="stat"
-                                    style={{ cursor: 'pointer', flexDirection: 'column', gap: 4 }}
-                                    onClick={() => setActionModal({ open: true, fund: f })}
-                                  >
-                                    <span className="label" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                                      持仓金额 <SettingsIcon width="12" height="12" style={{ opacity: 0.7 }} />
-                                    </span>
-                                    <span className="value">¥{profit.amount.toFixed(2)}</span>
-                                  </div>
-                                  <div className="stat" style={{ flexDirection: 'column', gap: 4 }}>
-                                    <span className="label">当日盈亏</span>
-                                    <span className={`value ${profit.profitToday > 0 ? 'up' : profit.profitToday < 0 ? 'down' : ''}`}>
-                                      {profit.profitToday > 0 ? '+' : profit.profitToday < 0 ? '-' : ''}¥{Math.abs(profit.profitToday).toFixed(2)}
-                                    </span>
-                                  </div>
-                                  {profit.profitTotal !== null && (
-                                    <div
-                                      className="stat"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setPercentModes(prev => ({ ...prev, [f.code]: !prev[f.code] }));
-                                      }}
-                                      style={{ cursor: 'pointer', flexDirection: 'column', gap: 4 }}
-                                      title="点击切换金额/百分比"
-                                    >
-                                      <span className="label">持有收益{percentModes[f.code] ? '(%)' : ''}</span>
-                                      <span className={`value ${profit.profitTotal > 0 ? 'up' : profit.profitTotal < 0 ? 'down' : ''}`}>
-                                        {profit.profitTotal > 0 ? '+' : profit.profitTotal < 0 ? '-' : ''}
-                                        {percentModes[f.code]
-                                          ? `${Math.abs((holding.cost * holding.share) ? (profit.profitTotal / (holding.cost * holding.share)) * 100 : 0).toFixed(2)}%`
-                                          : `¥${Math.abs(profit.profitTotal).toFixed(2)}`
-                                        }
-                                      </span>
-                                    </div>
-                                  )}
-                                </>
-                              );
-                            })()}
-                          </div>
-
-                          {f.estPricedCoverage > 0.05 && (
-                            <div style={{ fontSize: '10px', color: 'var(--muted)', marginTop: -8, marginBottom: 10, textAlign: 'right' }}>
-                              基于 {Math.round(f.estPricedCoverage * 100)}% 持仓估算
+                              <TrashIcon width="18" height="18" />
+                              <span>删除</span>
                             </div>
                           )}
-                          <div
-                            style={{ marginBottom: 8, cursor: 'pointer', userSelect: 'none' }}
-                            className="title"
-                            onClick={() => toggleCollapse(f.code)}
+                          <motion.div
+                            className={viewMode === 'card' ? 'glass card' : 'table-row'}
+                            drag={viewMode === 'list' && isMobile ? "x" : false}
+                            dragConstraints={{ left: -80, right: 0 }}
+                            dragElastic={0.1}
+                            // 增加 dragDirectionLock 确保在垂直滚动时不会轻易触发水平拖拽
+                            dragDirectionLock={true}
+                            // 调整触发阈值，只有明显的水平拖拽意图才响应
+                            onDragStart={(event, info) => {
+                              // 如果水平移动距离小于垂直移动距离，或者水平速度很小，视为垂直滚动意图，不进行拖拽处理
+                              // framer-motion 的 dragDirectionLock 已经处理了大部分情况，但可以进一步微调体验
+                            }}
+                            // 如果当前行不是被选中的行，强制回到原点 (x: 0)
+                            animate={viewMode === 'list' && isMobile ? { x: swipedFundCode === f.code ? -80 : 0 } : undefined}
+                            onDragEnd={(e, { offset, velocity }) => {
+                              if (viewMode === 'list' && isMobile) {
+                                if (offset.x < -40) {
+                                  setSwipedFundCode(f.code);
+                                } else {
+                                  setSwipedFundCode(null);
+                                }
+                              }
+                            }}
+                            onClick={(e) => {
+                              // 阻止事件冒泡，避免触发全局的 click listener 导致立刻被收起
+                              // 只有在已经展开的情况下点击自身才需要阻止冒泡（或者根据需求调整）
+                              // 这里我们希望：点击任何地方都收起。
+                              // 如果点击的是当前行，且不是拖拽操作，上面的全局 listener 会处理收起。
+                              // 但为了防止点击行内容触发收起后又立即触发行的其他点击逻辑（如果有的话），
+                              // 可以在这里处理。不过当前需求是“点击其他区域收起”，
+                              // 实际上全局 listener 已经覆盖了“点击任何区域（包括其他行）收起”。
+                              // 唯一的问题是：点击当前行的“删除按钮”时，会先触发全局 click 导致收起，然后触发删除吗？
+                              // 删除按钮在底层，通常不会受影响，因为 React 事件和原生事件的顺序。
+                              // 但为了保险，删除按钮的 onClick 应该阻止冒泡。
+
+                              // 如果当前行已展开，点击行内容（非删除按钮）应该收起
+                              if (viewMode === 'list' && isMobile && swipedFundCode === f.code) {
+                                e.stopPropagation(); // 阻止冒泡，自己处理收起，避免触发全局再次处理
+                                setSwipedFundCode(null);
+                              }
+                            }}
+                            style={{
+                              background: viewMode === 'list' ? 'var(--bg)' : undefined,
+                              position: 'relative',
+                              zIndex: 1
+                            }}
                           >
-                            <div className="row" style={{ width: '100%', flex: 1 }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                                <span>前10重仓股票</span>
-                                <ChevronIcon
-                                  width="16"
-                                  height="16"
-                                  className="muted"
-                                  style={{
-                                    transform: collapsedCodes.has(f.code) ? 'rotate(-90deg)' : 'rotate(0deg)',
-                                    transition: 'transform 0.2s ease'
-                                  }}
-                                />
-                              </div>
-                              <span className="muted">涨跌幅 / 占比</span>
-                            </div>
-                          </div>
-                          <AnimatePresence>
-                            {!collapsedCodes.has(f.code) && (
-                              <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: 'auto', opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                transition={{ duration: 0.3, ease: 'easeInOut' }}
-                                style={{ overflow: 'hidden' }}
-                              >
-                                {Array.isArray(f.holdings) && f.holdings.length ? (
-                                  <div className="list">
-                                    {f.holdings.map((h, idx) => (
-                                      <div className="item" key={idx}>
-                                        <span className="name">{h.name}</span>
-                                        <div className="values">
-                                          {typeof h.change === 'number' && (
-                                            <span className={`badge ${h.change > 0 ? 'up' : h.change < 0 ? 'down' : ''}`} style={{ marginRight: 8 }}>
-                                              {h.change > 0 ? '+' : ''}{h.change.toFixed(2)}%
-                                            </span>
-                                          )}
-                                          <span className="weight">{h.weight}</span>
-                                        </div>
-                                      </div>
-                                    ))}
+                            {viewMode === 'list' ? (
+                              <>
+                                <div className="table-cell name-cell">
+                                  {currentTab !== 'all' && currentTab !== 'fav' ? (
+                                    <button
+                                      className="icon-button fav-button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        removeFundFromCurrentGroup(f.code);
+                                      }}
+                                      title="从当前分组移除"
+                                    >
+                                      <ExitIcon width="18" height="18" style={{ transform: 'rotate(180deg)' }} />
+                                    </button>
+                                  ) : (
+                                    <button
+                                      className={`icon-button fav-button ${favorites.has(f.code) ? 'active' : ''}`}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        toggleFavorite(f.code);
+                                      }}
+                                      title={favorites.has(f.code) ? "取消自选" : "添加自选"}
+                                    >
+                                      <StarIcon width="18" height="18" filled={favorites.has(f.code)} />
+                                    </button>
+                                  )}
+                                  <div className="title-text">
+                                    <span
+                                      className={`name-text ${f.jzrq === todayStr ? 'updated' : ''}`}
+                                      title={f.jzrq === todayStr ? "今日净值已更新" : ""}
+                                    >
+                                      {f.name}
+                                    </span>
+                                    <span className="muted code-text">#{f.code}</span>
                                   </div>
-                                ) : (
-                                  <div className="muted" style={{ padding: '8px 0' }}>暂无重仓数据</div>
+                                </div>
+                                {(() => {
+                                  const now = new Date();
+                                  const isAfter9 = now.getHours() >= 9;
+                                  const hasTodayData = f.jzrq === todayStr;
+                                  const shouldHideChange = isTradingDay && isAfter9 && !hasTodayData;
+
+                                  if (!shouldHideChange) {
+                                    // 如果涨跌幅列显示（即非交易时段或今日净值已更新），则显示单位净值和真实涨跌幅
+                                    return (
+                                      <>
+                                        <div className="table-cell text-right value-cell">
+                                          <span style={{ fontWeight: 700 }}>{f.dwjz ?? '—'}</span>
+                                        </div>
+                                        <div className="table-cell text-right change-cell">
+                                          <span className={f.zzl > 0 ? 'up' : f.zzl < 0 ? 'down' : ''} style={{ fontWeight: 700 }}>
+                                            {f.zzl !== undefined ? `${f.zzl > 0 ? '+' : ''}${Number(f.zzl).toFixed(2)}%` : ''}
+                                          </span>
+                                        </div>
+                                      </>
+                                    );
+                                  } else {
+                                    // 否则显示估值净值和估值涨跌幅
+                                    // 如果是无估值数据的基金，直接显示净值数据
+                                    if (f.noValuation) {
+                                      return (
+                                        <>
+                                          <div className="table-cell text-right value-cell">
+                                            <span style={{ fontWeight: 700 }}>{f.dwjz ?? '—'}</span>
+                                          </div>
+                                          <div className="table-cell text-right change-cell">
+                                            <span className={f.zzl > 0 ? 'up' : f.zzl < 0 ? 'down' : ''} style={{ fontWeight: 700 }}>
+                                              {f.zzl !== undefined && f.zzl !== null ? `${f.zzl > 0 ? '+' : ''}${Number(f.zzl).toFixed(2)}%` : '—'}
+                                            </span>
+                                          </div>
+                                        </>
+                                      );
+                                    }
+                                    return (
+                                      <>
+                                        <div className="table-cell text-right value-cell">
+                                          <span style={{ fontWeight: 700 }}>{f.estPricedCoverage > 0.05 ? f.estGsz.toFixed(4) : (f.gsz ?? '—')}</span>
+                                        </div>
+                                        <div className="table-cell text-right change-cell">
+                                          <span className={f.estPricedCoverage > 0.05 ? (f.estGszzl > 0 ? 'up' : f.estGszzl < 0 ? 'down' : '') : (Number(f.gszzl) > 0 ? 'up' : Number(f.gszzl) < 0 ? 'down' : '')} style={{ fontWeight: 700 }}>
+                                            {f.estPricedCoverage > 0.05 ? `${f.estGszzl > 0 ? '+' : ''}${f.estGszzl.toFixed(2)}%` : (typeof f.gszzl === 'number' ? `${f.gszzl > 0 ? '+' : ''}${f.gszzl.toFixed(2)}%` : f.gszzl ?? '—')}
+                                          </span>
+                                        </div>
+                                      </>
+                                    );
+                                  }
+                                })()}
+                                <div className="table-cell text-right time-cell">
+                                  <span className="muted" style={{ fontSize: '12px' }}>{f.noValuation ? (f.jzrq || '-') : (f.gztime || f.time || '-')}</span>
+                                </div>
+                                {!isMobile && (() => {
+                                  const holding = holdings[f.code];
+                                  const profit = getHoldingProfit(f, holding);
+                                  const amount = profit ? profit.amount : null;
+                                  if (amount === null) {
+                                    return (
+                                      <div
+                                        className="table-cell text-right holding-amount-cell"
+                                        title="设置持仓"
+                                        onClick={(e) => { e.stopPropagation(); setHoldingModal({ open: true, fund: f }); }}
+                                      >
+                                        <span className="muted" style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '12px', cursor: 'pointer' }}>
+                                          未设置 <SettingsIcon width="12" height="12" />
+                                        </span>
+                                      </div>
+                                    );
+                                  }
+                                  return (
+                                    <div
+                                      className="table-cell text-right holding-amount-cell"
+                                      title="点击设置持仓"
+                                      onClick={(e) => { e.stopPropagation(); setActionModal({ open: true, fund: f }); }}
+                                    >
+                                      <span style={{ fontWeight: 700, marginRight: 6 }}>¥{amount.toFixed(2)}</span>
+                                      <button
+                                        className="icon-button"
+                                        onClick={(e) => { e.stopPropagation(); setActionModal({ open: true, fund: f }); }}
+                                        title="编辑持仓"
+                                        style={{ border: 'none', width: '28px', height: '28px', marginLeft: -6 }}
+                                      >
+                                        <SettingsIcon width="14" height="14" />
+                                      </button>
+                                    </div>
+                                  );
+                                })()}
+                                {(() => {
+                                  const holding = holdings[f.code];
+                                  const profit = getHoldingProfit(f, holding);
+                                  const profitValue = profit ? profit.profitToday : null;
+                                  const hasProfit = profitValue !== null;
+
+                                  return (
+                                    <div className="table-cell text-right profit-cell">
+                                      <span
+                                        className={hasProfit ? (profitValue > 0 ? 'up' : profitValue < 0 ? 'down' : '') : 'muted'}
+                                        style={{ fontWeight: 700 }}
+                                      >
+                                        {hasProfit
+                                          ? `${profitValue > 0 ? '+' : profitValue < 0 ? '-' : ''}¥${Math.abs(profitValue).toFixed(2)}`
+                                          : ''}
+                                      </span>
+                                    </div>
+                                  );
+                                })()}
+                                {!isMobile && (() => {
+                                  const holding = holdings[f.code];
+                                  const profit = getHoldingProfit(f, holding);
+                                  const total = profit ? profit.profitTotal : null;
+                                  const principal = holding && holding.cost && holding.share ? holding.cost * holding.share : 0;
+                                  const asPercent = percentModes[f.code];
+                                  const hasTotal = total !== null;
+                                  const formatted = hasTotal
+                                    ? (asPercent && principal > 0
+                                      ? `${total > 0 ? '+' : total < 0 ? '-' : ''}${Math.abs((total / principal) * 100).toFixed(2)}%`
+                                      : `${total > 0 ? '+' : total < 0 ? '-' : ''}¥${Math.abs(total).toFixed(2)}`)
+                                    : '';
+                                  const cls = hasTotal ? (total > 0 ? 'up' : total < 0 ? 'down' : '') : 'muted';
+                                  return (
+                                    <div
+                                      className="table-cell text-right holding-cell"
+                                      title="点击切换金额/百分比"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (hasTotal) {
+                                          setPercentModes(prev => ({ ...prev, [f.code]: !prev[f.code] }));
+                                        }
+                                      }}
+                                      style={{ cursor: hasTotal ? 'pointer' : 'default' }}
+                                    >
+                                      <span className={cls} style={{ fontWeight: 700 }}>{formatted}</span>
+                                    </div>
+                                  );
+                                })()}
+                                <div className="table-cell text-center action-cell" style={{ gap: 4 }}>
+                                  <button
+                                    className="icon-button danger"
+                                    onClick={() => !refreshing && requestRemoveFund(f)}
+                                    title="删除"
+                                    disabled={refreshing}
+                                    style={{ width: '28px', height: '28px', opacity: refreshing ? 0.6 : 1, cursor: refreshing ? 'not-allowed' : 'pointer' }}
+                                  >
+                                    <TrashIcon width="14" height="14" />
+                                  </button>
+                                </div>
+                              </>
+                            ) : (
+                              <>
+                                <div className="row" style={{ marginBottom: 10 }}>
+                                  <div className="title">
+                                    {currentTab !== 'all' && currentTab !== 'fav' ? (
+                                      <button
+                                        className="icon-button fav-button"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          removeFundFromCurrentGroup(f.code);
+                                        }}
+                                        title="从当前分组移除"
+                                      >
+                                        <ExitIcon width="18" height="18" style={{ transform: 'rotate(180deg)' }} />
+                                      </button>
+                                    ) : (
+                                      <button
+                                        className={`icon-button fav-button ${favorites.has(f.code) ? 'active' : ''}`}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          toggleFavorite(f.code);
+                                        }}
+                                        title={favorites.has(f.code) ? "取消自选" : "添加自选"}
+                                      >
+                                        <StarIcon width="18" height="18" filled={favorites.has(f.code)} />
+                                      </button>
+                                    )}
+                                    <div className="title-text">
+                                      <span
+                                        className={`name-text ${f.jzrq === todayStr ? 'updated' : ''}`}
+                                        title={f.jzrq === todayStr ? "今日净值已更新" : ""}
+                                      >
+                                        {f.name}
+                                      </span>
+                                      <span className="muted">#{f.code}</span>
+                                    </div>
+                                  </div>
+
+                                  <div className="actions">
+                                    <div className="badge-v">
+                                      <span>{f.noValuation ? '净值日期' : '估值时间'}</span>
+                                      <strong>{f.noValuation ? (f.jzrq || '-') : (f.gztime || f.time || '-')}</strong>
+                                    </div>
+                                    <div className="row" style={{ gap: 4 }}>
+                                      <button
+                                        className="icon-button danger"
+                                        onClick={() => !refreshing && requestRemoveFund(f)}
+                                        title="删除"
+                                        disabled={refreshing}
+                                        style={{ width: '28px', height: '28px', opacity: refreshing ? 0.6 : 1, cursor: refreshing ? 'not-allowed' : 'pointer' }}
+                                      >
+                                        <TrashIcon width="14" height="14" />
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="row" style={{ marginBottom: 12 }}>
+                                  <Stat label="单位净值" value={f.dwjz ?? '—'} />
+                                  {f.noValuation ? (
+                                    // 无估值数据的基金，直接显示净值涨跌幅，不显示估值相关字段
+                                    <Stat
+                                      label="涨跌幅"
+                                      value={f.zzl !== undefined && f.zzl !== null ? `${f.zzl > 0 ? '+' : ''}${Number(f.zzl).toFixed(2)}%` : '—'}
+                                      delta={f.zzl}
+                                    />
+                                  ) : (
+                                    <>
+                                      {(() => {
+                                        const now = new Date();
+                                        const isAfter9 = now.getHours() >= 9;
+                                        const hasTodayData = f.jzrq === todayStr;
+                                        const shouldHideChange = isTradingDay && isAfter9 && !hasTodayData;
+
+                                        if (shouldHideChange) return null;
+
+                                        return (
+                                          <Stat
+                                            label="涨跌幅"
+                                            value={f.zzl !== undefined ? `${f.zzl > 0 ? '+' : ''}${Number(f.zzl).toFixed(2)}%` : ''}
+                                            delta={f.zzl}
+                                          />
+                                        );
+                                      })()}
+                                      <Stat label="估值净值" value={f.estPricedCoverage > 0.05 ? f.estGsz.toFixed(4) : (f.gsz ?? '—')} />
+                                      <Stat
+                                        label="估值涨跌幅"
+                                        value={f.estPricedCoverage > 0.05 ? `${f.estGszzl > 0 ? '+' : ''}${f.estGszzl.toFixed(2)}%` : (typeof f.gszzl === 'number' ? `${f.gszzl > 0 ? '+' : ''}${f.gszzl.toFixed(2)}%` : f.gszzl ?? '—')}
+                                        delta={f.estPricedCoverage > 0.05 ? f.estGszzl : (Number(f.gszzl) || 0)}
+                                      />
+                                    </>
+                                  )}
+                                </div>
+
+                                <div className="row" style={{ marginBottom: 12 }}>
+                                  {(() => {
+                                    const holding = holdings[f.code];
+                                    const profit = getHoldingProfit(f, holding);
+
+                                    if (!profit) {
+                                      return (
+                                        <div className="stat" style={{ flexDirection: 'column', gap: 4 }}>
+                                          <span className="label">持仓金额</span>
+                                          <div
+                                            className="value muted"
+                                            style={{ fontSize: '14px', display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}
+                                            onClick={() => setHoldingModal({ open: true, fund: f })}
+                                          >
+                                            未设置 <SettingsIcon width="12" height="12" />
+                                          </div>
+                                        </div>
+                                      );
+                                    }
+
+                                    return (
+                                      <>
+                                        <div
+                                          className="stat"
+                                          style={{ cursor: 'pointer', flexDirection: 'column', gap: 4 }}
+                                          onClick={() => setActionModal({ open: true, fund: f })}
+                                        >
+                                          <span className="label" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                                            持仓金额 <SettingsIcon width="12" height="12" style={{ opacity: 0.7 }} />
+                                          </span>
+                                          <span className="value">¥{profit.amount.toFixed(2)}</span>
+                                        </div>
+                                        <div className="stat" style={{ flexDirection: 'column', gap: 4 }}>
+                                          <span className="label">当日盈亏</span>
+                                          <span className={`value ${profit.profitToday > 0 ? 'up' : profit.profitToday < 0 ? 'down' : ''}`}>
+                                            {profit.profitToday > 0 ? '+' : profit.profitToday < 0 ? '-' : ''}¥{Math.abs(profit.profitToday).toFixed(2)}
+                                          </span>
+                                        </div>
+                                        {profit.profitTotal !== null && (
+                                          <div
+                                            className="stat"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              setPercentModes(prev => ({ ...prev, [f.code]: !prev[f.code] }));
+                                            }}
+                                            style={{ cursor: 'pointer', flexDirection: 'column', gap: 4 }}
+                                            title="点击切换金额/百分比"
+                                          >
+                                            <span className="label">持有收益{percentModes[f.code] ? '(%)' : ''}</span>
+                                            <span className={`value ${profit.profitTotal > 0 ? 'up' : profit.profitTotal < 0 ? 'down' : ''}`}>
+                                              {profit.profitTotal > 0 ? '+' : profit.profitTotal < 0 ? '-' : ''}
+                                              {percentModes[f.code]
+                                                ? `${Math.abs((holding.cost * holding.share) ? (profit.profitTotal / (holding.cost * holding.share)) * 100 : 0).toFixed(2)}%`
+                                                : `¥${Math.abs(profit.profitTotal).toFixed(2)}`
+                                              }
+                                            </span>
+                                          </div>
+                                        )}
+                                      </>
+                                    );
+                                  })()}
+                                </div>
+
+                                {f.estPricedCoverage > 0.05 && (
+                                  <div style={{ fontSize: '10px', color: 'var(--muted)', marginTop: -8, marginBottom: 10, textAlign: 'right' }}>
+                                    基于 {Math.round(f.estPricedCoverage * 100)}% 持仓估算
+                                  </div>
                                 )}
-                              </motion.div>
+                                <div
+                                  style={{ marginBottom: 8, cursor: 'pointer', userSelect: 'none' }}
+                                  className="title"
+                                  onClick={() => toggleCollapse(f.code)}
+                                >
+                                  <div className="row" style={{ width: '100%', flex: 1 }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                      <span>前10重仓股票</span>
+                                      <ChevronIcon
+                                        width="16"
+                                        height="16"
+                                        className="muted"
+                                        style={{
+                                          transform: collapsedCodes.has(f.code) ? 'rotate(-90deg)' : 'rotate(0deg)',
+                                          transition: 'transform 0.2s ease'
+                                        }}
+                                      />
+                                    </div>
+                                    <span className="muted">涨跌幅 / 占比</span>
+                                  </div>
+                                </div>
+                                <AnimatePresence>
+                                  {!collapsedCodes.has(f.code) && (
+                                    <motion.div
+                                      initial={{ height: 0, opacity: 0 }}
+                                      animate={{ height: 'auto', opacity: 1 }}
+                                      exit={{ height: 0, opacity: 0 }}
+                                      transition={{ duration: 0.3, ease: 'easeInOut' }}
+                                      style={{ overflow: 'hidden' }}
+                                    >
+                                      {Array.isArray(f.holdings) && f.holdings.length ? (
+                                        <div className="list">
+                                          {f.holdings.map((h, idx) => (
+                                            <div className="item" key={idx}>
+                                              <span className="name">{h.name}</span>
+                                              <div className="values">
+                                                {typeof h.change === 'number' && (
+                                                  <span className={`badge ${h.change > 0 ? 'up' : h.change < 0 ? 'down' : ''}`} style={{ marginRight: 8 }}>
+                                                    {h.change > 0 ? '+' : ''}{h.change.toFixed(2)}%
+                                                  </span>
+                                                )}
+                                                <span className="weight">{h.weight}</span>
+                                              </div>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      ) : (
+                                        <div className="muted" style={{ padding: '8px 0' }}>暂无重仓数据</div>
+                                      )}
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
+                              </>
                             )}
-                          </AnimatePresence>
-                        </>
-                      )}
-                      </motion.div>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-                </div>
-              </motion.div>
-            </AnimatePresence>
-          </>
+                          </motion.div>
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </>
           )}
         </div>
       </div>
