@@ -562,13 +562,15 @@ input[type="number"] {
 }
 
 .sticky-toggle-btn {
-  display: none !important;
+  display: inline-flex !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-@media (max-width: 640px) {
-  .sticky-toggle-btn {
-    display: inline-flex !important;
-  }
+.sticky-toggle-btn:hover {
+  opacity: 1 !important;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
 }
 
 .icon-button.danger {
@@ -809,6 +811,15 @@ input[type="number"] {
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+.group-summary-sticky {
+  position: sticky;
+  z-index: 35;
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(16px);
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
 @media (max-width: 640px) {
   .filter-bar {
     position: sticky;
@@ -836,15 +847,12 @@ input[type="number"] {
   }
 
   .group-summary-sticky {
-    position: sticky;
     top: 175px;
-    z-index: 35;
     width: calc(100% + 32px);
     margin: 0 -16px 16px -16px;
     padding: 8px 16px;
-    background: rgba(15, 23, 42, 0.9);
+    border-radius: 0;
     border-bottom: 1px solid var(--border);
-    backdrop-filter: blur(16px);
   }
 
   .group-summary-sticky .group-summary-card {
