@@ -1443,7 +1443,8 @@ export default function HomePage() {
         setLoginSuccess('');
         setLoginError('');
       }
-      fetchCloudConfig(session.user.id);
+      // 仅在明确的登录动作（SIGNED_IN）时检查冲突；INITIAL_SESSION（刷新页面等）不检查，直接以云端为准
+      fetchCloudConfig(session.user.id, event === 'SIGNED_IN');
     };
 
     supabase.auth.getSession().then(async ({ data, error }) => {
@@ -2206,7 +2207,7 @@ export default function HomePage() {
     }
   };
 
-  const fetchCloudConfig = async (userId) => {
+  const fetchCloudConfig = async (userId, checkConflict = false) => {
     if (!userId) return;
     try {
       const { data, error } = await supabase
@@ -2229,9 +2230,14 @@ export default function HomePage() {
         const cloudComparable = getComparablePayload(data.data);
 
         if (localComparable !== cloudComparable) {
-          // 如果数据不一致，无论时间戳如何，都提示用户
-          // 用户可以选择使用本地数据覆盖云端，或者使用云端数据覆盖本地
-          setCloudConfigModal({ open: true, userId, type: 'conflict', cloudData: data.data });
+          // 如果数据不一致
+          if (checkConflict) {
+            // 只有明确要求检查冲突时才提示（例如刚登录时）
+            setCloudConfigModal({ open: true, userId, type: 'conflict', cloudData: data.data });
+            return;
+          }
+          // 否则直接覆盖本地（例如已登录状态下的刷新）
+          await applyCloudConfig(data.data, data.updated_at);
           return;
         }
 
@@ -2333,6 +2339,7 @@ export default function HomePage() {
         favorites: JSON.parse(localStorage.getItem('favorites') || '[]'),
         groups: JSON.parse(localStorage.getItem('groups') || '[]'),
         collapsedCodes: JSON.parse(localStorage.getItem('collapsedCodes') || '[]'),
+        collapsedTrends: JSON.parse(localStorage.getItem('collapsedTrends') || '[]'),
         refreshMs: parseInt(localStorage.getItem('refreshMs') || '30000', 10),
         viewMode: localStorage.getItem('viewMode') === 'list' ? 'list' : 'card',
         holdings: JSON.parse(localStorage.getItem('holdings') || '{}'),
@@ -2389,6 +2396,7 @@ export default function HomePage() {
         const currentFavorites = JSON.parse(localStorage.getItem('favorites') || '[]');
         const currentGroups = JSON.parse(localStorage.getItem('groups') || '[]');
         const currentCollapsed = JSON.parse(localStorage.getItem('collapsedCodes') || '[]');
+        const currentTrends = JSON.parse(localStorage.getItem('collapsedTrends') || '[]');
         const currentPendingTrades = JSON.parse(localStorage.getItem('pendingTrades') || '[]');
 
         let mergedFunds = currentFunds;
@@ -2432,6 +2440,12 @@ export default function HomePage() {
           const mergedCollapsed = Array.from(new Set([...currentCollapsed, ...data.collapsedCodes]));
           setCollapsedCodes(new Set(mergedCollapsed));
           storageHelper.setItem('collapsedCodes', JSON.stringify(mergedCollapsed));
+        }
+
+        if (Array.isArray(data.collapsedTrends)) {
+          const mergedTrends = Array.from(new Set([...currentTrends, ...data.collapsedTrends]));
+          setCollapsedTrends(new Set(mergedTrends));
+          storageHelper.setItem('collapsedTrends', JSON.stringify(mergedTrends));
         }
 
         if (typeof data.refreshMs === 'number' && data.refreshMs >= 5000) {
