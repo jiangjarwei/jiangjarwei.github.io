@@ -63,17 +63,9 @@ export default function Announcement() {
               <span>公告</span>
             </div>
             <div style={{ color: 'var(--text)', lineHeight: '1.6', fontSize: '15px' }}>
-              为了增加更多用户方便访问, 新增国内加速地址：<a className="link-button"
-                                                          target="_blank"
-                                                          rel="noopener noreferrer"
-                                                          style={{ color: 'var(--primary)', textDecoration: 'underline', padding: '0 4px', fontWeight: 600 }} href="https://fund.cc.cd/">https://fund.cc.cd/</a>
-              <p>节后第一次更新内容如下：</p>
-              <p>1. OCR 识别截图导入基金。</p>
-              <p>2. 基金历史曲线图。</p>
-              <p>3. 买入、卖出历史记录。</p>
-              以下内容会在近期更新：
-              <p>1. 定投。</p>
-              <p>2. 自定义布局。</p>
+               马年新年快乐！
+              <p> 祝江江天天开心</p>
+              <p> 马上有钱</p>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
