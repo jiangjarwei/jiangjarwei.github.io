@@ -3056,7 +3056,7 @@ export default function HomePage() {
               <UpdateIcon width="14" height="14" />
             </div>
           )}
-          <Image unoptimized alt="项目Github地址" src={githubImg} style={{ width: '30px', height: '30px', cursor: 'pointer' }} onClick={() => window.open("https://github.com/hzm0321/real-time-fund")} />
+          <Image unoptimized alt="项目Github地址" src={githubImg} style={{ width: '30px', height: '30px', cursor: 'pointer' }} onClick={() => window.open("https://github.com/jiangjarwei/jiangjarwei.github.io/")} />
           {isMobile && (
             <button
               className="icon-button mobile-search-btn"
