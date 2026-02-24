@@ -83,17 +83,26 @@ function ScanButton({ onClick, disabled }) {
   );
 }
 
-// 数字滚动组件
+// 数字滚动组件（初始化时无动画，后续变更再动画）
 function CountUp({ value, prefix = '', suffix = '', decimals = 2, className = '', style = {} }) {
   const [displayValue, setDisplayValue] = useState(value);
   const previousValue = useRef(value);
+  const isFirstChange = useRef(true);
 
   useEffect(() => {
     if (previousValue.current === value) return;
 
+    // 首次数值变化（包括从 0/默认值变为实际数据）不做动画，直接跳到目标值
+    if (isFirstChange.current) {
+      isFirstChange.current = false;
+      previousValue.current = value;
+      setDisplayValue(value);
+      return;
+    }
+
     const start = previousValue.current;
     const end = value;
-    const duration = 600; // 0.6秒动画
+    const duration = 400; // 0.4秒动画
     const startTime = performance.now();
 
     const animate = (currentTime) => {
@@ -156,7 +165,8 @@ function GroupSummary({ funds, holdings, groupName, getProfit, stickyTop }) {
         hasHolding = true;
         totalAsset += profit.amount;
         if (profit.profitToday != null) {
-          totalProfitToday += profit.profitToday;
+          // 与卡片展示口径一致：先按“分”四舍五入再汇总，避免浮点误差/逐项舍入差导致不一致
+          totalProfitToday += Math.round(profit.profitToday * 100) / 100;
           hasAnyTodayData = true;
         }
         if (profit.profitTotal !== null) {
