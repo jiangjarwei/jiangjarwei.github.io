@@ -123,11 +123,6 @@ docker compose up -d
 3. **调整频率**：点击右上角“设置”图标，可调整自动刷新的间隔时间。
 4. **删除基金**：点击卡片右上角的红色删除图标即可移除。
 
-## 💬 开发者交流群
-
-欢迎基金实时开发者加入微信群聊讨论开发与协作：  
-
-微信开发群人数已满200，如需加入请加微信号 `hzm1998hzm` 。加v备注：`基估宝开发`，邀请入群。
 
 ## 📝 免责声明
 
@@ -144,5 +139,5 @@ docker compose up -d
 完整协议文本见仓库根目录 [LICENSE](./LICENSE) 文件，或 [GNU AGPL v3 官方说明](https://www.gnu.org/licenses/agpl-3.0.html)。  
 
 ---
-二开或转载需注明出处。  
+二开 原作者：
 Made by [hzm](https://github.com/hzm0321)
